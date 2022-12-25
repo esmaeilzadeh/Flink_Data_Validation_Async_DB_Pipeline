@@ -1,0 +1,21 @@
+version: '3.7'
+services:
+  psql:
+    image: postgres:12
+    restart: always
+    environment:
+      POSTGRES_USER: ${PSQL_USER}
+      POSTGRES_PASSWORD: ${PSQL_PASSWORD}
+      POSTGRES_DB: ${PSQL_DATABASE}
+    ports:
+      - '5433:5432'
+    volumes:
+      - mohaymen-psql-db:/var/lib/postgresql/data
+  
+volumes:
+    mohaymen-psql-db:
+
+networks:
+  default:
+    external:
+      name: mohaymen_network
