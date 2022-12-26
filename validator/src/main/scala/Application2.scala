@@ -3,85 +3,56 @@ import doobie.implicits._
 import cats.effect.IO.asyncForIO
 import cats.effect._
 import cats.effect.unsafe.implicits.global
+import cats.free.Free
+import doobie.free.connection
+import doobie.hikari.HikariTransactor
+import doobie.util.ExecutionContexts
 import doobie.util.log.LogHandler.jdkLogHandler
 import doobie.util.transactor.Transactor.Aux
-import mohaymen.onlineprocessing.{Gender, Ids, Person, PostalAddress, PostalCode, Service}
+import mohaymen.onlineprocessing.Subscription.insertRegisteredMobile
+import mohaymen.onlineprocessing.{Gender, Ids, Person, PostalAddress, PostalCode, RegisteredMobile, Service}
+import org.apache.flink.streaming.api.scala.async.JavaResultFutureWrapper
+
+import scala.concurrent.Future
 
 object Application2 extends App {
 
 
 
   override def main(args: Array[String]): Unit = {
-    super.main(args)
-    val transactor: Aux[IO, Unit] = {
-      Transactor.fromDriverManager[IO](
-        "org.postgresql.Driver",
-        "jdbc:postgresql://localhost:5433/local_db",
-        "dbuser",
-        "dbpassword",
-      )
-    }
-    val person: Person = Person("mohammad","ezadeh","ali","777","1392/02/02",Gender(true),"342342334")
-    val address: PostalAddress = PostalAddress("poonak",PostalCode("234234243"),"232434")
-    val service: Service = Service("09127040915","234234",2323,23,234)
-
-    val sql = for {
-      customerId <- sql"""insert into "Customer" (
-                  name,
-                  family,
-                  father_name,
-                  certification_no,
-                  birth_date,
-                  gender,
-                  identification_no
-            ) values (
-            ${person.name},
-            ${person.family},
-            ${person.fatherName},
-            ${person.certificationNo},
-            ${person.birthDate},
-            ${person.gender.value},
-            ${person.identificationNo}
-            )"""
-        .updateWithLogHandler(jdkLogHandler)
-        .withUniqueGeneratedKeys[Int]("id")
-      addressId <- sql"""insert into "Address" (
-             address,
-             postal_code,
-             tel,
-             customer_id
-         ) values (
-            ${address.address},
-            ${address.postalCode},
-            ${address.tel},
-            ${customerId}
-          )"""
-        .updateWithLogHandler(jdkLogHandler)
-        .withUniqueGeneratedKeys[Int]("id")
-      serviceId <-
-        sql"""insert
-                 into "Service"
-                   (
-                   mobile_number,
-                   imsi,
-                   sms,
-                   data3g,
-                   data4g,
-                   customer_id
-                   )
-                 values (
-            ${service.mobileNumber},
-            ${service.imsi},
-            ${service.sms},
-            ${service.data3g},
-            ${service.data4g},
-            ${customerId}
-          )
-                 """
-        .updateWithLogHandler(jdkLogHandler)
-        .withUniqueGeneratedKeys[Int]("id")
-    } yield Ids(customerId, addressId, serviceId)
-      val r = sql.transact(transactor).unsafeRunSync()
+lazy val transactor: Resource[IO, HikariTransactor[IO]] =
+for {
+  ce <- ExecutionContexts.fixedThreadPool[IO](10) // our connect EC
+  xa <- HikariTransactor.newHikariTransactor[IO](
+            "org.postgresql.Driver",
+            "jdbc:postgresql://localhost:5433/local_db",
+            "dbuser",
+            "dbpassword",
+    ce                                      // await connection here
+  )
+} yield xa
+//    val person: Person = Person("mohammad","ezadeh","ali","777","1392/02/02",Gender(true),"342342333")
+//    val address: PostalAddress = PostalAddress("poonak",PostalCode("2342342243"),"232434")
+//    val service: Service = Service("09127040916","234234",2323,23,234)
+//    val registered = RegisteredMobile(address, service, person)
+////    val r = mohaymen.onlineprocessing.Subscription.insertRegisteredMobile(registered).transact(t)
+//      val r: Ids = transactor.use(t=>
+//        for {
+//          result <- mohaymen.onlineprocessing.Subscription.insertRegisteredMobile(registered).transact(t)
+//        } yield result
+//      ).unsafeRunSync()
+    val id = "342342334"
+//    val query = sql"select 3".query[Int].unique
+    val query = sql"""select count(s.mobile_number) FROM
+          "Service" as s INNER JOIN
+         "Customer" as c
+         ON s.customer_id = c.id
+         WHERE c.identification_no=$id limit 1 """.query[Int].unique
+    val r = transactor.use(t=>
+            for {
+              result <- query.transact(t)
+            } yield result
+          ).unsafeRunSync()
     println(r)
     }
 }

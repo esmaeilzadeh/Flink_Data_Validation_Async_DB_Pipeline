@@ -1,5 +1,5 @@
 import mohaymen.onlineprocessing.{Gender, InputRegisteredMobile, PostalAddress, PostalCode, Service}
-import mohaymen.onlineprocessing.validator.Rules.{allDigits, startWith}
+import FlinkHelpers.Kafka.play.Rules.{allDigits, startWith}
 import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json._
 import mohaymen.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
@@ -9,7 +9,7 @@ class EncodeDecodeTest extends AnyFunSuite {
 
   test("encode Decode passed") {
     val decoded =  InputRegisteredMobile(
-      PostalAddress("No#1 Street 1, ...",PostalCode("12132313"),"021343333"),
+      PostalAddress("No#1 Street 1, ...",PostalCode("1213206313"),"021343333"),
       Service(
         "09127040915",
         "432119642587415",
@@ -26,6 +26,7 @@ class EncodeDecodeTest extends AnyFunSuite {
       "123132123123123"
     )
     val encoded: JsValue = Json.toJson(decoded)
+    println(encoded)
     val decodedAgain = encoded.validate[InputRegisteredMobile]
     assert(decodedAgain == JsSuccess(decoded))
   }
@@ -52,7 +53,19 @@ class EncodeDecodeTest extends AnyFunSuite {
     println(encoded)
     assert(decodedAgain == JsError(
       List((
-        __ \ "address" \ "postalCode",List(JsonValidationError(List("this field should only contains digits"))))
+        __ \ "address" \ "postalCode",
+        List(
+          JsonValidationError(
+            List(
+              "this field should only contains digits"
+            )
+        ),
+          JsonValidationError(
+            List(
+              "length aaaaaaa is lesser than 10"
+            )
+          ),
+        ))
       )
     ))
   }

@@ -19,55 +19,62 @@ object Identification {
   }.toList
   def map(validationPassed: DataStream[RegisteredMobile :: String :: HNil],configs:AppConfig): DataStream[Either[(String, FormErrors), RegisteredMobile :: String :: HNil]] = {
 
-    val identificationStep1: DataStream[Option[Person] :: RegisteredMobile :: String :: HNil] =
-      AsyncDatabaseQuery.augmentWithSingle[RegisteredMobile :: String :: HNil,Person](validationPassed, in=>{
+    val withPerson: DataStream[Either[Throwable,Person] :: RegisteredMobile :: String :: HNil] =
+      AsyncDatabaseQuery.augmentWithSingle[RegisteredMobile :: String :: HNil,Person](
+        validationPassed,
+        in=>{
         val id = in.at[_0].person.identificationNo
-        //                     name:String,
-        //                     family:String,
-        //                     fatherName:String,
-        //                     certificationNo: String,
-        //                     birthDate:String,
-        //                     gender:Boolean,
-        //                     identificationNo:String,
-        sql"select name, family, fatherName, certificationNo, birthDate, identification_no from people where identification_no=$id limit 1"
+        sql"select name, family, father_name, certification_no, birth_date, identification_no from people where identification_no=$id limit 1"
           .queryWithLogHandler[Person](jdkLogHandler)
           .unique
-      },configs.globalJdbcConfig)
+      },
+        configs.globalJdbcConfig
+      )
 
 
-    val identificationStep2: DataStream[Option[PostalAddress]::Option[Person]  :: RegisteredMobile :: String :: HNil] = {
+    val withAddressAndPerson: DataStream[Either[Throwable,PostalAddress]::Either[Throwable,Person]  :: RegisteredMobile :: String :: HNil] = {
 
-      AsyncDatabaseQuery.augmentWithSingle[Option[Person] :: RegisteredMobile :: String :: HNil,PostalAddress](identificationStep1, in=>{
-        val pd = in.at[_1].address.postalCode
-        //                            address:String,
-        //                            postalCode:PostalCode,
-        //                            tel:String,
+      AsyncDatabaseQuery.augmentWithSingle[Either[Throwable,Person] :: RegisteredMobile :: String :: HNil,PostalAddress](withPerson, in=>{
+        val address = in.at[_1].address
+        val pd = address.postalCode.value
         sql"select address, postal_code, tel from postal_addresses where postal_code=$pd limit 1 "
           .queryWithLogHandler[PostalAddress](jdkLogHandler)
           .unique
       },configs.globalJdbcConfig)
     }
-    identificationStep2.map(
-      (i: Option[PostalAddress] :: Option[Person] :: RegisteredMobile :: String :: HNil) => {
+    withAddressAndPerson.map(
+      (i: Either[Throwable,PostalAddress]::Either[Throwable,Person] :: RegisteredMobile :: String :: HNil) => {
         val addressEither: Either[FormErrors, PostalAddress] = i.at[_0] match {
-          case None => Left(FormErrors(Seq(FieldError("address", Seq("not found in db.")))))
-          case Some(v) => {
-            if (v == i.at(_2).address)
-              Right(v)
-            else
-              Left(
-                FormErrors(Seq(FieldError("address", Seq("not found in db."))))
-              )
-          }
+          case Left(l) => Left(FormErrors(Seq(FieldError("address", Seq(l.getMessage)))))
+          case Right(v) => Right(v)
         }
         val personEither: Either[FormErrors, Person] = i.at[_1] match {
-          case None => Left(FormErrors(Seq(FieldError("person", Seq("not found in db.")))))
-          case Some(v) => Right(v)
+          case Left(l) => Left(FormErrors(Seq(FieldError("person", Seq(l.getMessage)))))
+          case Right(v) => Right(v)
         }
         personEither match {
-          case Right(_) =>
+          case Right(p) =>
             addressEither match {
-              case Right(_) => Right(i.at[_2] :: i.at[_3] :: HNil)
+              case Right(a) => {
+                val rm = i.at(_2)
+                val key = i.at(_3)
+                val result: Either[(String, FormErrors), RegisteredMobile :: String :: HNil] = (a==rm.address,p==rm.person) match {
+                  case (true,true) => Right( rm::key::HNil )
+                  case (false,true) =>Left(
+                    (key,FormErrors(Seq(FieldError("address", Seq("details is not match.")))))
+                  )
+                  case (true,false) =>Left(
+                    (key,FormErrors(Seq(FieldError("person", Seq("details is not match.")))))
+                  )
+                  case (false,false) =>Left(
+                    (key,FormErrors(Seq(
+                      FieldError("address", Seq("details is not match.")),
+                      FieldError("person", Seq("details is not match."))
+                    )))
+                  )
+                }
+                result
+              }
               case Left(ve) => Left((i.at[_3], ve))
             }
           case Left(ke) => addressEither match {

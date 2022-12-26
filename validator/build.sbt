@@ -1,8 +1,4 @@
 import sbt.Package.ManifestAttributes
-
-
-name := "validator"
-
 version := "0.1"
 
 ThisBuild / organization := "mohaymen"
@@ -13,7 +9,7 @@ ThisBuild / scalaVersion := Build.v.scala
 val flinkVersion = Build.v.flinkVersion
 val scalatestVersion = Build.v.scalaTest
 val circeVersion = "0.13.0"
-lazy val validator = (project in file("."))
+lazy val job = (project in file("."))
   .settings(
     libraryDependencies ++= Seq(
       //testing
@@ -83,3 +79,28 @@ libraryDependencies ++= Seq(
 )
 // https://mvnrepository.com/artifact/io.estatico/newtype
 libraryDependencies += "io.estatico" %% "newtype" % "0.4.4"
+
+Compile / run  := Defaults.runTask(Compile / fullClasspath,
+  Compile / run / mainClass,
+  Compile / run / runner
+).evaluated
+
+//stays inside the sbt console when we press "ctrl-c" while a Flink programme executes with "run" or "runMain"
+Compile / run / fork := true
+Global / cancelable := true
+
+enablePlugins(JavaAppPackaging)
+enablePlugins(DockerPlugin)
+
+//Assembly
+// exclude Scala library from assembly
+//test in assembly := {}
+import sbt.Package.ManifestAttributes
+import com.typesafe.sbt.SbtGit.git
+packageOptions := Seq(ManifestAttributes(("Repository-Commit", git.gitHeadCommit.value.get)))
+//packageOptions := Seq(ManifestAttributes(("Repository-Commit-Message", git.gitHeadMessage.value.get)))
+assembly / assemblyOption  := (assembly / assemblyOption).value.copy(includeScala = true)
+assemblyMergeStrategy in assembly := {
+  case PathList("META-INF", _*) => MergeStrategy.discard
+  case _                        => MergeStrategy.first
+}
