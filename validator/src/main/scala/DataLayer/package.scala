@@ -22,12 +22,12 @@ package object DataLayer {
                             record: A,
                             getId: A => doobie.ConnectionIO[Option[ID]],
                             insert: A => doobie.ConnectionIO[ID]
-                   ): Free[connection.ConnectionOp, ID] = {
+                   )(implicit oid:Ordering[ID]): Free[connection.ConnectionOp, ID] = {
     for {
       existingId <- getId(record)
       id <- existingId match {
         case None => insert(record)
-        case Some(p: ID) => sql"$p".query[ID].unique
+        case Some(p: ID) => Free.pure[connection.ConnectionOp,ID](p)
       }
     } yield id
   }

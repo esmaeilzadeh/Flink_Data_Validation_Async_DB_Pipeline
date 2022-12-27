@@ -36,11 +36,6 @@ object Subscription {
       }
     )
   }
-
-
-
-  def updateAddress(id:Int,person: Person):doobie.ConnectionIO[Unit] = ???
-
   def insertRegisteredMobile(in: RegisteredMobile): Free[connection.ConnectionOp, Ids] = {
     for {
       customerId <- models.Person.insertOrGetId(in.person)
