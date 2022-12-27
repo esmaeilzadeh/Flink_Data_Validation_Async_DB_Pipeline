@@ -9,7 +9,12 @@ package object onlineprocessing {
                       data4g:Short,
                       id:Option[Int] = None,
                       customerId:Option[Int] = None
-                    )
+                    ){
+    def augmentWithId(newCustomerId:Int): Service =
+      this.copy(
+        customerId = Some(newCustomerId)
+      )
+  }
   case class PostalCode(value:String)
   case class PostalAddress(
                             address:String,
