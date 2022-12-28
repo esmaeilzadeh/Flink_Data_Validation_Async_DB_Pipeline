@@ -22,6 +22,7 @@ project/*-shim.sbt
 project/project/
 project/target/
 target/
+validator/docker/usrlib/
 .scala_dependencies
 .worksheet
 .env
