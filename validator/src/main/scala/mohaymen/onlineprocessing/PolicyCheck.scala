@@ -35,7 +35,7 @@ object PolicyCheck {
             Left(
               (
                 x.at(_2),
-                FormErrors(Seq(FieldError("service/mobile",Seq("this person already registered all his/her legitimate phone numbers"))))
+                FormErrors(Seq(FieldError("service/mobile",Seq("this person already registered all his/her legitimate phone numbers"))),"policyChecking")
               )
             )
           else Right(x.at(_1)::x.at(_2)::HNil)

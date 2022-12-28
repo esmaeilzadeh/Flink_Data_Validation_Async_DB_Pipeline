@@ -6,7 +6,7 @@ import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler.jdkLogHandler
 import mohaymen.onlineprocessing.Service
 
-object Sertvice {
+object Service {
   def getId(record:Service):doobie.ConnectionIO[Option[Int]] = {
     sql"""select id from "Service" where mobile_number=${record.mobileNumber}"""
       .queryWithLogHandler[Int](jdkLogHandler)
@@ -21,7 +21,8 @@ object Sertvice {
                    sms,
                    data3g,
                    data4g,
-                   customer_id
+                   customer_id,
+                   address_id
                    )
                  values (
             ${record.mobileNumber},
@@ -29,7 +30,8 @@ object Sertvice {
             ${record.sms},
             ${record.data3g},
             ${record.data4g},
-            ${record.customerId}
+            ${record.customerId},
+            ${record.addressId}
           )
                  """
       .updateWithLogHandler(jdkLogHandler)

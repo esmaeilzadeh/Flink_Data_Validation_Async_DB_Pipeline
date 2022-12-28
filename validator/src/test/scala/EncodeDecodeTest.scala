@@ -1,4 +1,4 @@
-import mohaymen.onlineprocessing.{Gender, InputRegisteredMobile, PostalAddress, PostalCode, Service}
+import mohaymen.onlineprocessing.{Gender, InputRegisteredMobile, InputService, PostalAddress, PostalAddressInput, PostalCode, Service}
 import FlinkHelpers.Kafka.play.Rules.{allDigits, startWith}
 import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json._
@@ -9,8 +9,8 @@ class EncodeDecodeTest extends AnyFunSuite {
 
   test("encode Decode passed") {
     val decoded =  InputRegisteredMobile(
-      PostalAddress("No#1 Street 1, ...",PostalCode("1213206313"),"021343333"),
-      Service(
+      PostalAddressInput("No#1 Street 1, ...",PostalCode("1213206313"),"021343333"),
+      InputService(
         "09127040915",
         "432119642587415",
         1,
@@ -22,7 +22,7 @@ class EncodeDecodeTest extends AnyFunSuite {
       "eeeeeeeeeeeeeeee",
       "234234234234",
       "1378/01/10",
-      Gender(true),
+      1,
       "123132123123123"
     )
     val encoded: JsValue = Json.toJson(decoded)
@@ -32,8 +32,8 @@ class EncodeDecodeTest extends AnyFunSuite {
   }
   test("encode Decode decode failed because postalCode is wrong") {
     val decoded =  InputRegisteredMobile(
-      PostalAddress("No#1 Street 1, ...",PostalCode("aaaaaaa"),"021343333"),
-      Service(
+      PostalAddressInput("No#1 Street 1, ...",PostalCode("aaaaaaa"),"021343333"),
+      InputService(
         "09127040915",
         "432119642587415",
         1,
@@ -45,7 +45,7 @@ class EncodeDecodeTest extends AnyFunSuite {
       "eeeeeeeeeeeeeeee",
       "234234234234",
       "1378/01/10",
-      Gender(true),
+      1,
       "123132123123123"
     )
     val encoded: JsValue = Json.toJson(decoded)

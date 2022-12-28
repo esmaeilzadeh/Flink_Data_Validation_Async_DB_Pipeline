@@ -29,7 +29,7 @@ object Validation {
                   "json input is malformed."
                 )
               )
-            )
+            ),"validation"
           )
         )
       }

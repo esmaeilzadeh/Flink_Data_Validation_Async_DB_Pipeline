@@ -25,7 +25,7 @@ for {
   ce <- ExecutionContexts.fixedThreadPool[IO](10) // our connect EC
   xa <- HikariTransactor.newHikariTransactor[IO](
             "org.postgresql.Driver",
-            "jdbc:postgresql://localhost:5433/local_db",
+            "jdbc:postgresql://localhost:5433/remote_db",
             "dbuser",
             "dbpassword",
     ce                                      // await connection here
@@ -41,13 +41,11 @@ for {
 //          result <- mohaymen.onlineprocessing.Subscription.insertRegisteredMobile(registered).transact(t)
 //        } yield result
 //      ).unsafeRunSync()
-    val id = "342342334"
+    val id = "8205446298"
 //    val query = sql"select 3".query[Int].unique
-    val query = sql"""select count(s.mobile_number) FROM
-          "Service" as s INNER JOIN
-         "Customer" as c
-         ON s.customer_id = c.id
-         WHERE c.identification_no=$id limit 1 """.query[Int].unique
+    val query = sql"select name, family, father_name, certification_no, birth_date, gender, identification_no,null from people where identification_no=$id limit 1"
+      .queryWithLogHandler[Person](jdkLogHandler)
+      .unique
     val r = transactor.use(t=>
             for {
               result <- query.transact(t)

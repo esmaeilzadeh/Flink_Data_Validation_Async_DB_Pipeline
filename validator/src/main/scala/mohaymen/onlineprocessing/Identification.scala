@@ -24,7 +24,7 @@ object Identification {
         validationPassed,
         in=>{
         val id = in.at[_0].person.identificationNo
-        sql"select name, family, father_name, certification_no, birth_date, identification_no from people where identification_no=$id limit 1"
+        sql"select name, family, father_name, certification_no, birth_date, gender, identification_no,null from people where identification_no=$id limit 1"
           .queryWithLogHandler[Person](jdkLogHandler)
           .unique
       },
@@ -37,7 +37,7 @@ object Identification {
       AsyncDatabaseQuery.augmentWithSingle[Either[Throwable,Person] :: RegisteredMobile :: String :: HNil,PostalAddress](withPerson, in=>{
         val address = in.at[_1].address
         val pd = address.postalCode.value
-        sql"select address, postal_code, tel from postal_addresses where postal_code=$pd limit 1 "
+        sql"select address, postal_code, tel,null,null from postal_addresses where postal_code=$pd limit 1 "
           .queryWithLogHandler[PostalAddress](jdkLogHandler)
           .unique
       },configs.globalJdbcConfig)
@@ -45,11 +45,11 @@ object Identification {
     withAddressAndPerson.map(
       (i: Either[Throwable,PostalAddress]::Either[Throwable,Person] :: RegisteredMobile :: String :: HNil) => {
         val addressEither: Either[FormErrors, PostalAddress] = i.at[_0] match {
-          case Left(l) => Left(FormErrors(Seq(FieldError("address", Seq(l.getMessage)))))
+          case Left(l) => Left(FormErrors(Seq(FieldError("address", Seq(l.getMessage))),"identification"))
           case Right(v) => Right(v)
         }
         val personEither: Either[FormErrors, Person] = i.at[_1] match {
-          case Left(l) => Left(FormErrors(Seq(FieldError("person", Seq(l.getMessage)))))
+          case Left(l) => Left(FormErrors(Seq(FieldError("person", Seq(l.getMessage))),"identification"))
           case Right(v) => Right(v)
         }
         personEither match {
@@ -61,16 +61,16 @@ object Identification {
                 val result: Either[(String, FormErrors), RegisteredMobile :: String :: HNil] = (a==rm.address,p==rm.person) match {
                   case (true,true) => Right( rm::key::HNil )
                   case (false,true) =>Left(
-                    (key,FormErrors(Seq(FieldError("address", Seq("details is not match.")))))
+                    (key,FormErrors(Seq(FieldError("address", Seq("details is not match input: "+rm.address+" not equal to "+a))),"identification"))
                   )
                   case (true,false) =>Left(
-                    (key,FormErrors(Seq(FieldError("person", Seq("details is not match.")))))
+                    (key,FormErrors(Seq(FieldError("person", Seq("details is not match input: "+rm.person+" not equal to "+p))),"identification"))
                   )
                   case (false,false) =>Left(
                     (key,FormErrors(Seq(
                       FieldError("address", Seq("details is not match.")),
                       FieldError("person", Seq("details is not match."))
-                    )))
+                    ),"identification"))
                   )
                 }
                 result

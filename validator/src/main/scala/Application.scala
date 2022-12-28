@@ -3,7 +3,7 @@ import FlinkHelpers.{ Kafka, disJoin}
 import FlinkHelpers.Kafka.KafkaStringDeserializer.consumerFromTopic
 import FlinkHelpers.Kafka.play.GenericKafkaSerializer.sinkToTopic
 import mohaymen.onlineprocessing
-import mohaymen.onlineprocessing.validator.{ FormErrors, Validation, fromJsError}
+import mohaymen.onlineprocessing.validator.{  Validation, fromJsError}
 
 import mohaymen.onlineprocessing.{ Identification,   PolicyCheck,  RegisteredMobile,  Subscription}
 import org.apache.flink.api.common.typeinfo.TypeInformation

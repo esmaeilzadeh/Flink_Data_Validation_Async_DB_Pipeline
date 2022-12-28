@@ -4,16 +4,31 @@ package object onlineprocessing {
   case class Service(
                       mobileNumber:String,
                       imsi:String,
-                      sms:Short,
-                      data3g:Short,
-                      data4g:Short,
+                      sms:Boolean,
+                      data3g:Boolean,
+                      data4g:Boolean,
                       id:Option[Int] = None,
-                      customerId:Option[Int] = None
+                      customerId:Option[Int] = None,
+                      addressId:Option[Int] = None
                     ){
-    def augmentWithId(newCustomerId:Int): Service =
+    def augmentWithId(newCustomerId:Int,newAddressId:Int): Service =
       this.copy(
-        customerId = Some(newCustomerId)
+          customerId = Some(newCustomerId),
+          addressId = Some(newAddressId)
       )
+  }
+  case class InputService(mobileNumber:String,
+                          imsi:String,
+                          sms:Int,
+                          data3g:Int,
+                          data4g:Int){
+    def toWellFormed = Service(
+      mobileNumber,
+      imsi,
+      if(sms>0) true else false,
+      if(data3g>0) true else false,
+      if(data4g>0) true else false
+    )
   }
   case class PostalCode(value:String)
   case class PostalAddress(
@@ -23,6 +38,17 @@ package object onlineprocessing {
                             id:Option[Int]=None,
                             customerId:Option[Int]=None
                           )
+  case class PostalAddressInput(
+                            address:String,
+                            postalCode:PostalCode,
+                            tel:String
+                          ) {
+    def toWelformed = PostalAddress(
+      address:String,
+      postalCode:PostalCode,
+      tel:String
+    )
+  }
   //0:male,1:female
   case class Gender(value:Boolean)
   case class Person(
@@ -37,26 +63,26 @@ package object onlineprocessing {
                    )
 
   case class InputRegisteredMobile(
-                                    address:PostalAddress,
-                                    service:Service,
+                                    address:PostalAddressInput,
+                                    service:InputService,
                                     name:String,
                                     family:String,
                                     fatherName:String,
                                     certificationNo: String,
                                     birthDate:String,
-                                    gender:Gender,
+                                    gender:Int,
                                     identificationNo:String
                                   ){
     def toWellFormed:RegisteredMobile = RegisteredMobile(
-      address,
-      service,
+      address.toWelformed,
+      service.toWellFormed,
       Person(
         name,
         family,
         fatherName,
         certificationNo,
         birthDate,
-        gender,
+        Gender(if(gender>0) true else false),
         identificationNo
       )
     )
@@ -66,17 +92,17 @@ package object onlineprocessing {
                               service:Service,
                               person:Person
                              ){
-    def toMalformed:InputRegisteredMobile = InputRegisteredMobile(
-      address,
-      service,
-      person.name,
-      person.family,
-      person.fatherName,
-      person.certificationNo,
-      person.birthDate,
-      person.gender,
-      person.identificationNo
-    )
+//    def toMalformed:InputRegisteredMobile = InputRegisteredMobile(
+//      address,
+//      service,
+//      person.name,
+//      person.family,
+//      person.fatherName,
+//      person.certificationNo,
+//      person.birthDate,
+//      person.gender,
+//      person.identificationNo
+//    )
     def augmentWIthIds(ids:Ids):RegisteredMobile = {
       this.copy(
         person=person.copy(id=Some(ids.personId)),

@@ -12,7 +12,7 @@ class ValidatorFunction extends MapFunction[String,Either[FormErrors,InputRegist
     } catch {
       case e: JsonParseException => {
         println()
-        Left(FormErrors(Seq(FieldError("/",Seq("input data is not a well formed JSON.")))))
+        Left(FormErrors(Seq(FieldError("/",Seq("input data is not a well formed JSON."))),"validation"))
       }
     }
   }

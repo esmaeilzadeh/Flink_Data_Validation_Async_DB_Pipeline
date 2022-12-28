@@ -29,7 +29,7 @@ object Subscription {
             Left(
               (
                 x.at(_2),
-                FormErrors(Seq(FieldError("/", Seq("subscription phase failed."))))
+                FormErrors(Seq(FieldError("/", Seq("subscription phase failed."))),"subscription")
               )
             )
         }
@@ -40,10 +40,9 @@ object Subscription {
     for {
       customerId <- models.Person.insertOrGetId(in.person)
       addressId <- models.PostalAddress.insertOrGetId(in.address)
-      serviceId <- models.Sertvice.insertOrGetId(
-        in.service.augmentWithId(customerId)
+      serviceId <- models.Service.insertOrGetId(
+        in.service.augmentWithId(customerId,addressId)
       )
     } yield Ids(customerId, addressId, serviceId)
   }
-
 }
