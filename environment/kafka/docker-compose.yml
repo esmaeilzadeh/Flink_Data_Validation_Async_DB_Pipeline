@@ -75,3 +75,8 @@ volumes:
     broker-data:
     zookeeper-data:
     zookeeper-txn-logs:
+    
+networks:
+  default:
+    external:
+      name: mohaymen_network

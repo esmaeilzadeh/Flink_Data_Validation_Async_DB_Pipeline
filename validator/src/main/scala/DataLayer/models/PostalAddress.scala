@@ -3,8 +3,14 @@ import cats.free.Free
 import doobie.free.connection
 import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler.jdkLogHandler
-import mohaymen.onlineprocessing.PostalAddress
-
+case class PostalCode(value:String)
+case class PostalAddress(
+                          address:String,
+                          postalCode:PostalCode,
+                          tel:String,
+                          id:Option[Int]=None,
+                          customerId:Option[Int]=None
+                        )
 object PostalAddress {
   def getId(record:PostalAddress):doobie.ConnectionIO[Option[Int]] = {
     sql"""select id from "Address" where postal_code=${record.postalCode.value}"""

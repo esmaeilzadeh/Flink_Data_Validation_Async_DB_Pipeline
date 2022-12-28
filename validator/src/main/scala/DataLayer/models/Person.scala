@@ -4,8 +4,17 @@ import cats.free.Free
 import doobie.free.connection
 import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler.jdkLogHandler
-import mohaymen.onlineprocessing.Person
-
+case class Gender(value:Boolean)
+case class Person(
+                   name:String,
+                   family:String,
+                   fatherName:String,
+                   certificationNo: String,
+                   birthDate:String,
+                   gender:Gender,
+                   identificationNo:String,
+                   id:Option[Int] = None
+                 )
 object Person {
   def getId(record:Person):doobie.ConnectionIO[Option[Int]] = {
     sql"""select id from "Customer" where identification_no=${record.identificationNo}"""

@@ -1,22 +1,8 @@
 package mohaymen
-package object onlineprocessing {
 
-  case class Service(
-                      mobileNumber:String,
-                      imsi:String,
-                      sms:Boolean,
-                      data3g:Boolean,
-                      data4g:Boolean,
-                      id:Option[Int] = None,
-                      customerId:Option[Int] = None,
-                      addressId:Option[Int] = None
-                    ){
-    def augmentWithId(newCustomerId:Int,newAddressId:Int): Service =
-      this.copy(
-          customerId = Some(newCustomerId),
-          addressId = Some(newAddressId)
-      )
-  }
+import DataLayer.models.{Gender, Person, PostalAddress, PostalCode, Service}
+
+package object onlineprocessing {
   case class InputService(mobileNumber:String,
                           imsi:String,
                           sms:Int,
@@ -30,14 +16,7 @@ package object onlineprocessing {
       if(data4g>0) true else false
     )
   }
-  case class PostalCode(value:String)
-  case class PostalAddress(
-                            address:String,
-                            postalCode:PostalCode,
-                            tel:String,
-                            id:Option[Int]=None,
-                            customerId:Option[Int]=None
-                          )
+
   case class PostalAddressInput(
                             address:String,
                             postalCode:PostalCode,
@@ -50,17 +29,7 @@ package object onlineprocessing {
     )
   }
   //0:male,1:female
-  case class Gender(value:Boolean)
-  case class Person(
-                     name:String,
-                     family:String,
-                     fatherName:String,
-                     certificationNo: String,
-                     birthDate:String,
-                     gender:Gender,
-                     identificationNo:String,
-                     id:Option[Int] = None
-                   )
+
 
   case class InputRegisteredMobile(
                                     address:PostalAddressInput,
@@ -92,17 +61,6 @@ package object onlineprocessing {
                               service:Service,
                               person:Person
                              ){
-//    def toMalformed:InputRegisteredMobile = InputRegisteredMobile(
-//      address,
-//      service,
-//      person.name,
-//      person.family,
-//      person.fatherName,
-//      person.certificationNo,
-//      person.birthDate,
-//      person.gender,
-//      person.identificationNo
-//    )
     def augmentWIthIds(ids:Ids):RegisteredMobile = {
       this.copy(
         person=person.copy(id=Some(ids.personId)),

@@ -1,6 +1,7 @@
 package mohaymen.onlineprocessing.validator
+import DataLayer.models.{Gender, PostalCode}
 import FlinkHelpers.Kafka.play.Rules.{allDigits, lengthBetween, verifyOrFail}
-import mohaymen.onlineprocessing.{Gender, InputRegisteredMobile, InputService, PostalAddress, PostalAddressInput, PostalCode, Service}
+import mohaymen.onlineprocessing.{InputRegisteredMobile, InputService, PostalAddressInput}
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 import play.api.libs.functional.syntax._

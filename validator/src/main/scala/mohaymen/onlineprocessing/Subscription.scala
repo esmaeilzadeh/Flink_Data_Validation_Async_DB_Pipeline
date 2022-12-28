@@ -29,18 +29,18 @@ object Subscription {
             Left(
               (
                 x.at(_2),
-                FormErrors(Seq(FieldError("/", Seq("subscription phase failed."))),"subscription")
+                FormErrors(Seq(FieldError("/", Seq(l.getMessage))),"subscription")
               )
             )
         }
       }
-    )
+    ).setParallelism(configs.parallelism.subscription)
   }
   def insertRegisteredMobile(in: RegisteredMobile): Free[connection.ConnectionOp, Ids] = {
     for {
       customerId <- models.Person.insertOrGetId(in.person)
       addressId <- models.PostalAddress.insertOrGetId(in.address)
-      serviceId <- models.Service.insertOrGetId(
+      serviceId <- models.Service.insert(
         in.service.augmentWithId(customerId,addressId)
       )
     } yield Ids(customerId, addressId, serviceId)

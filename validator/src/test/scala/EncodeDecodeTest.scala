@@ -1,4 +1,5 @@
-import mohaymen.onlineprocessing.{Gender, InputRegisteredMobile, InputService, PostalAddress, PostalAddressInput, PostalCode, Service}
+import DataLayer.models.PostalCode
+import mohaymen.onlineprocessing.{InputRegisteredMobile, InputService, PostalAddressInput}
 import FlinkHelpers.Kafka.play.Rules.{allDigits, startWith}
 import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json._

@@ -2,8 +2,10 @@ import cats.free.Free
 import doobie.free.connection
 import doobie.implicits.toSqlInterpolator
 
+import scala.reflect.ClassTag
+
 package object DataLayer {
-  def upsert[A, ID](
+  def upsert[A, ID:ClassTag](
                      record: A,
                      getExistingId: A => doobie.ConnectionIO[Option[ID]],
                      insert: A => doobie.ConnectionIO[ID],
@@ -18,7 +20,7 @@ package object DataLayer {
       }
     } yield id
   }
-  def insertOrGetId[A, ID](
+  def insertOrGetId[A, ID:ClassTag](
                             record: A,
                             getId: A => doobie.ConnectionIO[Option[ID]],
                             insert: A => doobie.ConnectionIO[ID]

@@ -1,3 +1,4 @@
+import DataLayer.models.Person
 import doobie._
 import doobie.implicits._
 import cats.effect.IO.asyncForIO
@@ -10,7 +11,6 @@ import doobie.util.ExecutionContexts
 import doobie.util.log.LogHandler.jdkLogHandler
 import doobie.util.transactor.Transactor.Aux
 import mohaymen.onlineprocessing.Subscription.insertRegisteredMobile
-import mohaymen.onlineprocessing.{Gender, Ids, Person, PostalAddress, PostalCode, RegisteredMobile, Service}
 import org.apache.flink.streaming.api.scala.async.JavaResultFutureWrapper
 
 import scala.concurrent.Future

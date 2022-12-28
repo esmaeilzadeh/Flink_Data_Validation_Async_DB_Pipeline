@@ -1,5 +1,6 @@
 package mohaymen.onlineprocessing
 import Configs.AppConfig
+import DataLayer.models.{Person, PostalAddress}
 import FlinkHelpers.AsyncDatabaseQuery
 import doobie.implicits._
 import mohaymen.onlineprocessing.validator.{FieldError, FormErrors, fromJsError}
@@ -83,6 +84,6 @@ object Identification {
           }
         }
       }
-    )
+    ).setParallelism(configs.parallelism.identification)
   }
 }

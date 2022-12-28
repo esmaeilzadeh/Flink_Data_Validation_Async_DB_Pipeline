@@ -41,6 +41,6 @@ object PolicyCheck {
           else Right(x.at(_1)::x.at(_2)::HNil)
       }
     }
-    )
+    ).setParallelism(configs.parallelism.policyCheck)
   }
 }
