@@ -1,7 +1,9 @@
 version: '3.7'
 services:
   psql:
-    image: postgres:12
+#    image: postgres:12
+    build:
+      context: .
     restart: always
     environment:
       POSTGRES_USER: ${PSQL_USER}
