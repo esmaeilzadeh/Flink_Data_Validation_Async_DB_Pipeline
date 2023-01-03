@@ -11,10 +11,11 @@ import doobie.util.Read
 import doobie.util.Read._
 import doobie.util.log.LogHandler.jdkLogHandler
 import shapeless.Nat.{_0, _1, _2, _3}
-
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 import scala.reflect.runtime.universe._
 object Identification {
-
+  val logger: Logger = LoggerFactory.getLogger("Identification")
   def classAccessors[T: TypeTag]: List[MethodSymbol] = typeOf[T].members.collect {
     case m: MethodSymbol if m.isCaseAccessor => m
   }.toList
@@ -59,18 +60,22 @@ object Identification {
               case Right(a) => {
                 val rm = i.at(_2)
                 val key = i.at(_3)
+                val addressDiffFields = FieldError("address", Seq("details is not match input: " + rm.address + " not equal to " + a))
+                val personDiffFields = FieldError("person", Seq("details is not match input: " + rm.person + " not equal to " + p))
                 val result: Either[(String, FormErrors), RegisteredMobile :: String :: HNil] = (a==rm.address,p==rm.person) match {
                   case (true,true) => Right( rm::key::HNil )
-                  case (false,true) =>Left(
-                    (key,FormErrors(Seq(FieldError("address", Seq("details is not match input: "+rm.address+" not equal to "+a))),"identification"))
+                  case (false,true) =>
+                    Left(
+                    (key,FormErrors(Seq(addressDiffFields),"identification"))
                   )
-                  case (true,false) =>Left(
-                    (key,FormErrors(Seq(FieldError("person", Seq("details is not match input: "+rm.person+" not equal to "+p))),"identification"))
+                  case (true,false) =>
+                    Left(
+                    (key,FormErrors(Seq(personDiffFields),"identification"))
                   )
                   case (false,false) =>Left(
                     (key,FormErrors(Seq(
-                      FieldError("address", Seq("details is not match.")),
-                      FieldError("person", Seq("details is not match."))
+                      addressDiffFields,
+                      personDiffFields
                     ),"identification"))
                   )
                 }

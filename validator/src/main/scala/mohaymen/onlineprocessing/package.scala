@@ -3,7 +3,8 @@ package mohaymen
 import DataLayer.models.{Gender, Person, PostalAddress, PostalCode, Service}
 
 package object onlineprocessing {
-  case class InputService(mobileNumber:String,
+  case class MobileNumber(value: String)
+  case class InputService(mobileNumber:MobileNumber,
                           imsi:String,
                           sms:Int,
                           data3g:Int,

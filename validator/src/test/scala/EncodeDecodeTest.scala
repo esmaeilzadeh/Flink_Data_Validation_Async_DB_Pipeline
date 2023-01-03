@@ -1,5 +1,5 @@
 import DataLayer.models.PostalCode
-import mohaymen.onlineprocessing.{InputRegisteredMobile, InputService, PostalAddressInput}
+import mohaymen.onlineprocessing.{InputRegisteredMobile, InputService, MobileNumber, PostalAddressInput}
 import FlinkHelpers.Kafka.play.Rules.{allDigits, startWith}
 import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json._
@@ -12,7 +12,7 @@ class EncodeDecodeTest extends AnyFunSuite {
     val decoded =  InputRegisteredMobile(
       PostalAddressInput("No#1 Street 1, ...",PostalCode("1213206313"),"021343333"),
       InputService(
-        "09127040915",
+        MobileNumber("09127040915"),
         "432119642587415",
         1,
         0,
@@ -35,7 +35,7 @@ class EncodeDecodeTest extends AnyFunSuite {
     val decoded =  InputRegisteredMobile(
       PostalAddressInput("No#1 Street 1, ...",PostalCode("aaaaaaa"),"021343333"),
       InputService(
-        "09127040915",
+        MobileNumber("09127040915"),
         "432119642587415",
         1,
         0,

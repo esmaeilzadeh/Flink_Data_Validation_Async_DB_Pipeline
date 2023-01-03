@@ -21,28 +21,34 @@ object Rules {
 
   def startWith(start: String)(implicit reads: Reads[String]): Reads[String] = {
     verifyOrFail(
-      (
         (i: String) =>
           if (i.startsWith(start))
             Right(i)
           else
             Left("this field is not started with " + start)
         )
-    )
   }
 
   def lengthBetween(min: Int, max: Int)(implicit reads: Reads[String]): Reads[String] = {
     verifyOrFail(
-      (
         (i: String) => {
           (i.length > min - 1, i.length < max + 1) match {
             case (true, true) => Right(i)
-            case (false, true) => Left(s"length ${i} is lesser than " + min)
-            case (true, false) => Left(s"length ${i} is greater than " + max)
-            case (false, false) => Left("max and min is not correctly set.")
+            case (false, true) => Left(s"length of ${i} is lesser than " + min)
+            case (true, false) => Left(s"length of ${i} is greater than " + max)
+            case (false, false) => Left("max length and min length is not correctly set.")
           }
         }
-        )
     )
   }
+  def allowedValues[A](allowed:List[A])(implicit reads: Reads[A]): Reads[A] ={
+    verifyOrFail(
+      (i: A) =>
+        if (allowed.indexOf(i)>=0)
+          Right(i)
+        else
+          Left("allowed values for this field are: " + allowed.mkString(","))
+    )
+  }
+
 }

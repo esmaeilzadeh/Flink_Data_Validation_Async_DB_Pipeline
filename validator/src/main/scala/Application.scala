@@ -8,16 +8,17 @@ import mohaymen.onlineprocessing.{Identification, PolicyCheck, RegisteredMobile,
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.streaming.api.scala.{DataStream, StreamExecutionEnvironment, createTypeInformation}
 import play.api.libs.json.JsError
-
-import java.util.logging.Logger
 import io.circe.generic.auto._
 import shapeless._
 import HList._
 import akka.event.Logging.LogLevel
+import com.sun.org.slf4j.internal.Logger
 import shapeless.Nat.{_0, _1, _2, _3}
+//import org.slf4j.Logger
+//import org.slf4j.LoggerFactory
 
 object Application extends App {
-  val logger: Logger = Logger.getLogger(this.getClass.getName)
+//  val logger: Logger = LoggerFactory.getLogger("Application")
   override def main(args: Array[String]): Unit = {
 
     implicit val typeInfo0 = TypeInformation.of(classOf[(String, Either[JsError, RegisteredMobile])])

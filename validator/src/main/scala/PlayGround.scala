@@ -15,7 +15,7 @@ import org.apache.flink.streaming.api.scala.async.JavaResultFutureWrapper
 
 import scala.concurrent.Future
 
-object Application2 extends App {
+object PlayGround extends App {
 
 
 

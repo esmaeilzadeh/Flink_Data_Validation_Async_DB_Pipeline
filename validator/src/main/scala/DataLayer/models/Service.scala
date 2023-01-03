@@ -4,8 +4,9 @@ import cats.free.Free
 import doobie.free.connection
 import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler.jdkLogHandler
+import mohaymen.onlineprocessing.MobileNumber
 case class Service(
-                    mobileNumber:String,
+                    mobileNumber:MobileNumber,
                     imsi:String,
                     sms:Boolean,
                     data3g:Boolean,
@@ -39,7 +40,7 @@ object Service {
                    address_id
                    )
                  values (
-            ${record.mobileNumber},
+            ${record.mobileNumber.value},
             ${record.imsi},
             ${record.sms},
             ${record.data3g},
