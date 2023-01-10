@@ -1,10 +1,10 @@
-package mohaymen.onlineprocessing.validator
+package esmaeilzadeh.onlineprocessing.validator
 import com.fasterxml.jackson.core.JsonParseException
-import mohaymen.onlineprocessing.InputRegisteredMobile
+import esmaeilzadeh.onlineprocessing.InputRegisteredMobile
 import org.apache.flink.api.common.functions.MapFunction
 import play.api.libs.json.{JsError, JsValue, Json}
 class ValidatorFunction extends MapFunction[String,Either[FormErrors,InputRegisteredMobile]]{
-  import mohaymen.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
+  import esmaeilzadeh.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
   override def map(value: String): Either[FormErrors, InputRegisteredMobile] = {
     try {
       val json: JsValue = Json.parse(value)

@@ -1,9 +1,9 @@
-package mohaymen.onlineprocessing.validator
+package esmaeilzadeh.onlineprocessing.validator
 import Configs.AppConfig
 import FlinkHelpers.Kafka
 import play.api.libs.json.{JsError, JsPath, JsResult, JsValue, Json, JsonValidationError}
-import mohaymen.onlineprocessing.{InputRegisteredMobile, RegisteredMobile}
-import mohaymen.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
+import esmaeilzadeh.onlineprocessing.{InputRegisteredMobile, RegisteredMobile}
+import esmaeilzadeh.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
 import org.apache.flink.api.common.typeinfo.TypeInformation
 import org.apache.flink.streaming.api.scala.{DataStream, createTypeInformation}
 import shapeless.HNil

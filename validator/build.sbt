@@ -1,7 +1,7 @@
 import sbt.Package.ManifestAttributes
 version := "0.1"
 
-ThisBuild / organization := "mohaymen"
+ThisBuild / organization := "esmaeilzadeh"
 ThisBuild / name := "onlineProcessing"
 ThisBuild / version := "0.1"
 ThisBuild / scalaVersion := Build.v.scala

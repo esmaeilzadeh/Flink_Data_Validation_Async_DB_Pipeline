@@ -1,10 +1,10 @@
 import DataLayer.models.PostalCode
-import mohaymen.onlineprocessing.{InputRegisteredMobile, InputService, MobileNumber, PostalAddressInput}
+import esmaeilzadeh.onlineprocessing.{InputRegisteredMobile, InputService, MobileNumber, PostalAddressInput}
 import FlinkHelpers.Kafka.play.Rules.{allDigits, startWith}
 import org.scalatest.funsuite.AnyFunSuite
 import play.api.libs.json._
-import mohaymen.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
-import mohaymen.onlineprocessing.validator.AppliedRules.RegisteredMobileWrite
+import esmaeilzadeh.onlineprocessing.validator.AppliedRules.RegisteredMobileRead
+import esmaeilzadeh.onlineprocessing.validator.AppliedRules.RegisteredMobileWrite
 
 class EncodeDecodeTest extends AnyFunSuite {
 

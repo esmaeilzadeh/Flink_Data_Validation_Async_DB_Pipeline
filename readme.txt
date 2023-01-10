@@ -1,10 +1,11 @@
-در صورتی که sbt روی سیستمی که می خواید build بگیرید نصب ندارید قبلش از اینجا باید آخرین ورژنش رو نصب کنید روی سیستمتون: 
+This a simple Apache Flink data streaming pipeline which applies a series of custom validations that was generated with Play validation library. Then connect to an external DB asynchronously and fetch data and check is input data are identical with the record existed in the DB the write the output in another DB.
+
+If you don't have installed sbt please download and install it from here:
 https://www.scala-sbt.org/download.html
-
-
-برای اجرای پروژه لطفا دستور زیر رو در root پروژه بزنید:
+for runing the project:
 ./build.sh
-این سرویس ها روی سیستم فعال میشه:
+
+After running the project these services becomes available:
 kafka:
 localhost:9092 (system is not dependent on this port and if this is used with another service you can change it)
 
@@ -16,13 +17,15 @@ pass: dbpassword
 jobmanager:
 http://localhost:8090
 
-برای مشاهده لاگ flink:
+For watching the flink log you can run this command:
 docker-compose -f validator/docker/docker-compose.yml logs -f
-برای respawn کردن کل سرویس ها (در صورت بروز مشکل یا down شدن هر کدام):
+
+To respawn the system you can run this command:
 ./respawn.sh
 
 
-در تاپیک registered_mobiles  مقدار زیر رو وارد کنید که بتونید smoke تست بگیرید:
+
+For testing the system you can put this message in the registered_mobiles topic:
 key:
 {"userId":23423},
 value:

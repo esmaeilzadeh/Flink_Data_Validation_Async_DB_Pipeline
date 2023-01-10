@@ -4,7 +4,7 @@ import cats.free.Free
 import doobie.free.connection
 import doobie.implicits.toSqlInterpolator
 import doobie.util.log.LogHandler.jdkLogHandler
-import mohaymen.onlineprocessing.MobileNumber
+import esmaeilzadeh.onlineprocessing.MobileNumber
 case class Service(
                     mobileNumber:MobileNumber,
                     imsi:String,
